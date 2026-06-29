@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{322A08B1-4DA7-FE89-3F6C-09B72852E4B5}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "ALSCommunity",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
