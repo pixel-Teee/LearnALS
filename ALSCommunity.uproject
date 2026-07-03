@@ -1,13 +1,16 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{322A08B1-4DA7-FE89-3F6C-09B72852E4B5}",
+	"EngineAssociation": "{A25F31A7-47F6-B2DA-62FE-2ABE4FC0116E}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
 		{
 			"Name": "ALSCommunity",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [

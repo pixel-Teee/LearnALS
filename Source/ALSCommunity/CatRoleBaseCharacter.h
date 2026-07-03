@@ -7,6 +7,7 @@
 #include "CatRoleStructEnumLibrary.h"
 #include "CatRoleBaseCharacter.generated.h"
 
+class UCatRolePlayerCameraBehavior;
 UCLASS()
 class ALSCOMMUNITY_API ACatRoleBaseCharacter : public ACharacter
 {
@@ -30,6 +31,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
 	void ForwardMovementAction(float Value);
 
+	//摄像机系统
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Camera System")
+	void SetCameraBehavior(UCatRolePlayerCameraBehavior* CamBeh) { CameraBehavior = CamBeh; }
 
 	//状态变更
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
@@ -91,5 +95,12 @@ protected:
 	FVector ReplicatedCurrentAcceleration = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
+	FRotator ReplicatedControlRotation = FRotator::ZeroRotator;
+
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	float EasedMaxAcceleration = 0.0f;
+
+	//camera的anim instance，去驱动更新camera manager
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Camera")
+	TObjectPtr<UCatRolePlayerCameraBehavior> CameraBehavior;
 };

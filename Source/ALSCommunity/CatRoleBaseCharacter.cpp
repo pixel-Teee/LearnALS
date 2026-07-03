@@ -92,8 +92,12 @@ void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)
 	{
 		//加速度和最大加速度
 		ReplicatedCurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
+		//获取controller的rotation
+		ReplicatedControlRotation = GetControlRotation();
 		EasedMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration();
 	}
+
+	AimingRotation = FMath::RInterpTo(AimingRotation, ReplicatedControlRotation, DeltaTime, 30);
 
 	//由速度判断是否处于移动
 	const FVector CurrentVel = GetVelocity();
@@ -106,5 +110,6 @@ void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)
 	{
 		//TODO:Implement This
 	}
+
 }
 

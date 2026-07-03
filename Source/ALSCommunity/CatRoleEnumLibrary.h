@@ -21,6 +21,16 @@ enum class ECatRoleGait : uint8
 	Sprinting //加速
 };
 
+//角色旋转模式
+UENUM(BlueprintType, meta = (ScriptName = "CatRole_RotationMode"))
+enum class ECatRoleRotationMode : uint8
+{
+	VelocityDirection,
+	LookingDirection,
+	Aiming
+};
+
+
 USTRUCT(BlueprintType)
 struct FCatRoleAnimCharacterInformation
 {
