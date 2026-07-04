@@ -8,14 +8,16 @@
 #include "CatRoleBaseCharacter.generated.h"
 
 class UCatRolePlayerCameraBehavior;
+class UCatRoleMovementComponent;
 UCLASS()
 class ALSCOMMUNITY_API ACatRoleBaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	ACatRoleBaseCharacter();
+	ACatRoleBaseCharacter(const FObjectInitializer& ObjectInitializer);
 
+	virtual void PostInitializeComponents() override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,20 +29,34 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//ÊäÈë
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
+	//è¾“å…¥
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
 	void ForwardMovementAction(float Value);
 
-	//ÉãÏñ»úÏµÍ³
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
+	void CameraUpAction(float Value);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
+	void CameraRightAction(float Value);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
+	void RightMovementAction(float Value);
+
+	//æ‘„åƒæœºç³»ç»Ÿ
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Camera System")
 	void SetCameraBehavior(UCatRolePlayerCameraBehavior* CamBeh) { CameraBehavior = CamBeh; }
 
-	//×´Ì¬±ä¸ü
+	//çŠ¶æ€å˜æ›´
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 
 	virtual void OnMovementStateChanged(ECatRoleMovementState PreviousState);
 	
 	void SetMovementState(const ECatRoleMovementState NewState, bool bForce = false);
+
+	void UpdateCharacterMovement();
+
+	//æ›´æ–°è§’è‰²è½¬å‘ï¼ˆç§»åŠ¨æ‘„åƒæœºçš„æ—¶å€™ï¼Œè®©è§’è‰²æ¯”å¦‚ä¹Ÿæœå‘æ‘„åƒæœºçœ‹å‘çš„ä½ç½®ï¼‰
+	void UpdateGroundedRotation(float DeltaTime);
 
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
 	ECatRoleMovementState GetMovementState() const { return MovementState; }
@@ -57,26 +73,68 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
 	float GetSpeed() const { return Speed; }
 
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Essential Information")
+	FRotator GetAimingRotation() const { return AimingRotation; }
+
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
 	bool IsMoving() const { return bIsMoving; }
 
-	//Ã¿Ö¡»ñÈ¡Ò»Ğ©ÖØÒªĞÅÏ¢£¬´ÓCMC×é¼ş
+	//æ¯å¸§è·å–ä¸€äº›é‡è¦ä¿¡æ¯ï¼Œä»CMCç»„ä»¶
 	void SetEssentialValues(float DetalTime);
 
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Movement System")
 	bool HasMovementInput() const { return bHasMovementInput; }
+
+	//å·¥å…·
+	float CalculateGroundedRotationRate() const;
+
+
+	void SmoothCharacterRotation(FRotator Target, float TargetInterpSpeed, float ActorInterpSpeed, float DeltaTime);
+
+	void LimitRotation(float AimYawMin, float AimYawMax, float InterpSpeed, float DeltaTime);
+
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Utility")
+	float GetAnimCurveValue(FName CurveName) const;
 protected:
+	//è¾“å…¥
+	UPROPERTY(EditDefaultsOnly, Category = "CatRole|Input", BlueprintReadOnly)
+	float LookUpDownRate = 1.25f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "CatRole|Input", BlueprintReadOnly)
+	float LookLeftRightRate = 1.25f;
+
+	//çŠ¶æ€å€¼
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
 	ECatRoleMovementState MovementState = ECatRoleMovementState::None;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
 	ECatRoleMovementState PrevMovementState = ECatRoleMovementState::None;
 
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
+	ECatRoleMovementAction MovementAction = ECatRoleMovementAction::None;
+
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
+	ECatRoleRotationMode RotationMode = ECatRoleRotationMode::LookingDirection;
+
+	//ç¬¬ä¸‰äººç§°è¿˜æ˜¯ç¬¬ä¸€äººç§°
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
+	ECatRoleViewMode ViewMode = ECatRoleViewMode::ThirdPerson;
+
+	//è¿™ä¸ªaiming rotationæ˜¯controllerçš„rotation
 	FRotator AimingRotation = FRotator::ZeroRotator;
 
-	//²½Ì¬£¬Âı×ß£¬±¼ÅÜ£¬³å´Ì
+	//æ­¥æ€ï¼Œæ…¢èµ°ï¼Œå¥”è·‘ï¼Œå†²åˆº
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
 	ECatRoleGait Gait = ECatRoleGait::Walking;
+
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Rotation System")
+	FRotator TargetRotation = FRotator::ZeroRotator;
+
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
+	FRotator LastVelocityRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
+	FRotator LastMovementInputRotation;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	bool bIsMoving = false;
@@ -88,9 +146,9 @@ protected:
 	float Speed = 0.0f;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
-	float MovementInputAmount = 0.0f; //¼ÓËÙ¶ÈµÄµ¥Î»ÏòÁ¿
+	float MovementInputAmount = 0.0f; //åŠ é€Ÿåº¦çš„å•ä½å‘é‡
 
-	//¸´ÖÆµÄÖØÒªĞÅÏ¢(TODO:¼ÓÉÏ¸´ÖÆµÄ±ØÒª±ê¼Ç)
+	//å¤åˆ¶çš„é‡è¦ä¿¡æ¯(TODO:åŠ ä¸Šå¤åˆ¶çš„å¿…è¦æ ‡è®°)
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	FVector ReplicatedCurrentAcceleration = FVector::ZeroVector;
 
@@ -100,7 +158,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	float EasedMaxAcceleration = 0.0f;
 
-	//cameraµÄanim instance£¬È¥Çı¶¯¸üĞÂcamera manager
+	//cameraçš„anim instanceï¼Œå»é©±åŠ¨æ›´æ–°camera manager
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Camera")
 	TObjectPtr<UCatRolePlayerCameraBehavior> CameraBehavior;
+
+	//custom movement component
+	UPROPERTY()
+	TObjectPtr<UCatRoleMovementComponent> MyCharacterMovementComponent;
 };

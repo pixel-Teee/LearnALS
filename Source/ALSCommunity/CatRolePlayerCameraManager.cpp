@@ -28,5 +28,29 @@ void ACatRolePlayerCameraManager::OnPossess(ACatRoleBaseCharacter* NewCharacter)
 
 void ACatRolePlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime)
 {
+	if (OutVT.Target)
+	{
+		FVector OutLocation;
+		FRotator OutRotation;
+		//float OutFOV;
 
+		if (OutVT.Target->IsA<ACatRoleBaseCharacter>())
+		{
+			//TODO:实现这个
+			//if (CustomCameraBehavior(DeltaTime, OutLocation, OutRotation, OutFOV))
+			//{
+			//	OutVT.POV.Location = OutLocation;
+			//	OutVT.POV.Rotation = OutRotation;
+			//	OutVT.POV.FOV = OutFOV;
+			//}
+			//else
+			{
+				OutVT.Target->CalcCamera(DeltaTime, OutVT.POV);
+			}
+		}
+		else
+		{
+			OutVT.Target->CalcCamera(DeltaTime, OutVT.POV);
+		}
+	}
 }

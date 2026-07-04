@@ -12,7 +12,7 @@ void ACatRolePlayerController::OnPossess(APawn* NewPawn)
 	Super::OnPossess(NewPawn);
 	PossessedCharacter = Cast<ACatRoleBaseCharacter>(NewPawn);
 
-	//ÉèÖÃÊäÈë
+	//è®¾ç½®è¾“å…¥
 	SetupInputs();
 }
 
@@ -40,7 +40,7 @@ void ACatRolePlayerController::BindActions(UInputMappingContext* Context)
 		UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 		if (EnhancedInputComponent)
 		{
-			//¶ÔÓ¦º¯ÊıÃû
+			//å¯¹åº”å‡½æ•°å
 			TSet<const UInputAction*> UniqueActions;
 			for (const FEnhancedActionKeyMapping& Keymapping : Mappings)
 			{
@@ -72,5 +72,29 @@ void ACatRolePlayerController::ForwardMovementAction(const FInputActionValue& Va
 	if (PossessedCharacter)
 	{
 		PossessedCharacter->ForwardMovementAction(Value.GetMagnitude());
+	}
+}
+
+void ACatRolePlayerController::RightMovementAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter)
+	{
+		PossessedCharacter->RightMovementAction(Value.GetMagnitude());
+	}
+}
+
+void ACatRolePlayerController::CameraUpAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter)
+	{
+		PossessedCharacter->CameraUpAction(Value.GetMagnitude());
+	}
+}
+
+void ACatRolePlayerController::CameraRightAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter)
+	{
+		PossessedCharacter->CameraRightAction(Value.GetMagnitude());
 	}
 }

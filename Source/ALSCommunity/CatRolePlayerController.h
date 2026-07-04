@@ -26,6 +26,15 @@ protected:
 
 	UFUNCTION()
 	void ForwardMovementAction(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void RightMovementAction(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void CameraUpAction(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void CameraRightAction(const FInputActionValue& Value);
 public:
 	/** Main character reference */
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole")

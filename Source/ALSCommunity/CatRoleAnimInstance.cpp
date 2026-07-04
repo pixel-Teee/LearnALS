@@ -4,6 +4,8 @@
 #include "CatRoleAnimInstance.h"
 #include "CatRoleBaseCharacter.h"
 #include "Math/UnrealMathUtility.h"
+#include "CatRoleMathLibrary.h"
+#include "Curves/CurveVector.h"
 
 static const FName NAME_BasePose_CLF(TEXT("BasePose_CLF"));
 static const FName NAME_W_Gait(TEXT("W_Gait"));
@@ -26,15 +28,19 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-	//¸üĞÂÔË¶¯×´Ì¬
+	//æ›´æ–°è¿åŠ¨çŠ¶æ€
 	MovementState = Character->GetMovementState();
-	//²½Ì¬×ß×Ë
+	//æ­¥æ€èµ°å§¿
 	Gait = Character->GetGait();
-	//ÒÆ¶¯ÊäÈë(´ÓCMC»ñÈ¡µÄ)
+	//ç§»åŠ¨è¾“å…¥(ä»CMCè·å–çš„)
 	CharacterInformation.MovementInput = Character->GetMovementInput();
 	CharacterInformation.Speed = Character->GetSpeed();
 	CharacterInformation.bHasMovementInput = Character->HasMovementInput();
 	CharacterInformation.bIsMoving = Character->IsMoving();
+	CharacterInformation.Speed = Character->GetSpeed();
+
+	//controllerçš„æ—‹è½¬ï¼Œè§’è‰²æœå‘æ–¹å‘
+	CharacterInformation.AimingRotation = Character->GetAimingRotation();
 	if (MovementState.Grounded())
 	{
 		const bool bPrevShouldMove = Grounded.bShouldMove;
@@ -42,8 +48,10 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 		if (Grounded.bShouldMove)
 		{
-			//¸üĞÂÒÆ¶¯¶¯»­2D»ìºÏ¿Õ¼äËùĞèÒªµÄ²ÎÊı
+			//æ›´æ–°ç§»åŠ¨åŠ¨ç”»2Dæ··åˆç©ºé—´æ‰€éœ€è¦çš„å‚æ•°
 			UpdateMovementValues(DeltaSeconds);
+			//æ›´æ–°æœå‘
+			UpdateRotationValues();
 		}
 	}
 }
@@ -51,32 +59,48 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UCatRoleAnimInstance::UpdateMovementValues(float DeltaSeconds)
 {
-	//¼ÆËã walk/run »ìºÏ
+	//è®¡ç®— walk/run æ··åˆ
 	Grounded.WalkRunBlend = CalculateWalkRunBlend();
 
-	//¼ÆËã²½³¤»ìºÏ
+	//è®¡ç®—æ­¥é•¿æ··åˆ
 	Grounded.StrideBlend = CalculateStrideBlend();
 }
 
 
+void UCatRoleAnimInstance::UpdateRotationValues()
+{
+	//è®¾ç½®ç§»åŠ¨æ–¹å‘
+	MovementDirection = CalculateMovementDirection();
+
+	FRotator Delta = CharacterInformation.Velocity.ToOrientationRotator() - CharacterInformation.AimingRotation;
+	Delta.Normalize();
+	//ä»¥åèˆªè§’ä¸ºè¾“å…¥ï¼Œè·å–ä¸€ä¸ªå‘é‡ï¼Œæ—‹è½¬è„šçš„æ—¶å€™ä½¿ç”¨
+	const FVector& FBOffset = YawOffset_FB->GetVectorValue(Delta.Yaw);
+	Grounded.FYaw = FBOffset.X;
+	Grounded.BYaw = FBOffset.Y;
+	const FVector& LROffset = YawOffset_LR->GetVectorValue(Delta.Yaw);
+	Grounded.LYaw = LROffset.X;
+	Grounded.RYaw = LROffset.Y;
+}
+
 float UCatRoleAnimInstance::CalculateWalkRunBlend() const
 {
-	//ÓÃÓÚ»ìºÏ¿Õ¼äÖĞĞĞ×ßºÍ±¼ÅÜµÄ»ìºÏ
+	//ç”¨äºæ··åˆç©ºé—´ä¸­è¡Œèµ°å’Œå¥”è·‘çš„æ··åˆ
 	return Gait.Walking() ? 0.0f : 1.0f;
 }
 
 
 float UCatRoleAnimInstance::CalculateStrideBlend() const
 {
-	//»ìºÏ¿Õ¼ä£¬Á½½ÅÖ®¼äµÄ¼ä¾à
+	//æ··åˆç©ºé—´ï¼Œä¸¤è„šä¹‹é—´çš„é—´è·
 
-	//»ñÈ¡ËÙ¶È
+	//è·å–é€Ÿåº¦
 	const float CurveTime = CharacterInformation.Speed / GetOwningComponent()->GetComponentScale().Z;
 
-	//»ñÈ¡µ±Ç°²¥·ÅµÄ¶¯»­ÖĞ£¬Ëù°üº¬µÄ¶¯»­ÇúÏßµÄÄ³Ò»¸öÊ±¿ÌµÄÖµ
+	//è·å–å½“å‰æ’­æ”¾çš„åŠ¨ç”»ä¸­ï¼Œæ‰€åŒ…å«çš„åŠ¨ç”»æ›²çº¿çš„æŸä¸€ä¸ªæ—¶åˆ»çš„å€¼
 	const float ClampedGait = GetAnimCurveClamped(NAME_W_Gait, -1.0, 0.0f, 1.0f);
 
-	//ÔÚ×ßºÍ±¼ÅÜµÄÇúÏßÖ®¼ä½øĞĞ²åÖµ
+	//åœ¨èµ°å’Œå¥”è·‘çš„æ›²çº¿ä¹‹é—´è¿›è¡Œæ’å€¼
 	const float LerpedStrideBlend = 
 	FMath::Lerp(StrideBlend_N_Walk->GetFloatValue(CurveTime), StrideBlend_N_Run->GetFloatValue(CurveTime),
 	ClampedGait);
@@ -85,6 +109,19 @@ float UCatRoleAnimInstance::CalculateStrideBlend() const
 		GetCurveValue(NAME_BasePose_CLF));
 }
 
+
+ECatRoleMovementDirection UCatRoleAnimInstance::CalculateMovementDirection() const
+{
+	if (Gait.Sprinting())
+	{
+		return ECatRoleMovementDirection::Forward;
+	}
+	//è·å–è§’è‰²ç§»åŠ¨æ–¹å‘å’Œè§’è‰²æœå‘æ–¹å‘çš„å·®å€¼ï¼Œç„¶ååˆ¤æ–­ç§»åŠ¨æ–¹å‘
+	FRotator Delta = CharacterInformation.Velocity.ToOrientationRotator() - CharacterInformation.AimingRotation;
+	Delta.Normalize();
+	//åˆ¤æ–­è§’åº¦æ˜¯å¦åœ¨æŸä¸ªåŒºé—´é‡Œé¢ï¼Œç„¶åè®¡ç®—å‡ºä¸åŒæœå‘
+	return UCatRoleMathLibrary::CalculateQuadrant(MovementDirection, 70.0f, -70.0f, 110.0f, -110.0f, 5.0f, Delta.Yaw);
+}
 
 float UCatRoleAnimInstance::GetAnimCurveClamped(const FName& Name, float Bias, float ClampMin, float ClampMax) const
 {

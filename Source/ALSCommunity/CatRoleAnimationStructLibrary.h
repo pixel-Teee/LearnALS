@@ -4,7 +4,7 @@
 #include "CatRoleEnumLibrary.h"
 #include "CatRoleAnimationStructLibrary.generated.h"
 
-//用于anim instance的结构体
+//鐢ㄤ簬anim instance鐨勭粨鏋勪綋
 USTRUCT(BlueprintType)
 struct FCatRoleAnimGraphGrounded
 {
@@ -18,4 +18,16 @@ struct FCatRoleAnimGraphGrounded
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
 	float StrideBlend = 0.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
+	float FYaw = 0.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
+	float BYaw = 0.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
+	float LYaw = 0.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
+	float RYaw = 0.0f;
 };
