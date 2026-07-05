@@ -143,6 +143,7 @@ void ACatRoleBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 				{
 					//walking or running
 					const float YawOffsetCurveVal = GetAnimCurveValue(NAME_YawOffset);
+					UE_LOG(LogTemp, Log, TEXT("walking or running yaw offset value:%f"), YawOffsetCurveVal);
 					YawValue = AimingRotation.Yaw + YawOffsetCurveVal;
 				}
 				//设置角色的旋转
@@ -218,6 +219,11 @@ void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)
 
 	//由速度判断是否处于移动
 	const FVector CurrentVel = GetVelocity();
+
+	//获取加速度
+	const FVector NewAcceleration = (CurrentVel - PreviousVelocity) / DeltaTime;
+	Acceleration = NewAcceleration.IsNearlyZero() || IsLocallyControlled() ? NewAcceleration : Acceleration / 2;
+
 	Speed = CurrentVel.Size2D();
 	bIsMoving = Speed > 1.0f;
 	if (bIsMoving)

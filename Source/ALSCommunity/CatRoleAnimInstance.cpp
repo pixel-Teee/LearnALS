@@ -6,6 +6,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "CatRoleMathLibrary.h"
 #include "Curves/CurveVector.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 static const FName NAME_BasePose_CLF(TEXT("BasePose_CLF"));
 static const FName NAME_W_Gait(TEXT("W_Gait"));
@@ -38,8 +39,11 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	CharacterInformation.bHasMovementInput = Character->HasMovementInput();
 	CharacterInformation.bIsMoving = Character->IsMoving();
 	CharacterInformation.Speed = Character->GetSpeed();
+	CharacterInformation.Velocity = Character->GetCharacterMovement()->Velocity;
+	CharacterInformation.CharacterActorRotation = Character->GetActorRotation();
+	CharacterInformation.Acceleration = Character->GetAcceleration();
 
-	//controller的旋转，角色朝向方向
+	//controller的旋转，视角的旋转
 	CharacterInformation.AimingRotation = Character->GetAimingRotation();
 	if (MovementState.Grounded())
 	{
@@ -59,6 +63,14 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UCatRoleAnimInstance::UpdateMovementValues(float DeltaSeconds)
 {
+	const FCatRoleVelocityBlend& TargetBlend = CalculateVelocityBlend();
+	VelocityBlend.F = FMath::FInterpTo(VelocityBlend.F, TargetBlend.F, DeltaSeconds, Config.VelocityBlendInterpSpeed);
+	VelocityBlend.B = FMath::FInterpTo(VelocityBlend.B, TargetBlend.B, DeltaSeconds, Config.VelocityBlendInterpSpeed);
+	VelocityBlend.L = FMath::FInterpTo(VelocityBlend.L, TargetBlend.L, DeltaSeconds, Config.VelocityBlendInterpSpeed);
+	VelocityBlend.R = FMath::FInterpTo(VelocityBlend.R, TargetBlend.R, DeltaSeconds, Config.VelocityBlendInterpSpeed);
+
+	RelativeAccelerationAmount = CalculateRelativeAccelerationAmount();
+
 	//计算 walk/run 混合
 	Grounded.WalkRunBlend = CalculateWalkRunBlend();
 
@@ -74,7 +86,7 @@ void UCatRoleAnimInstance::UpdateRotationValues()
 
 	FRotator Delta = CharacterInformation.Velocity.ToOrientationRotator() - CharacterInformation.AimingRotation;
 	Delta.Normalize();
-	//以偏航角为输入，获取一个向量，旋转脚的时候使用
+	//以偏航角为输入，获取一个向量，ACatRoleBaseCharacter::UpdateGroundedRotation使用
 	const FVector& FBOffset = YawOffset_FB->GetVectorValue(Delta.Yaw);
 	Grounded.FYaw = FBOffset.X;
 	Grounded.BYaw = FBOffset.Y;
@@ -100,7 +112,7 @@ float UCatRoleAnimInstance::CalculateStrideBlend() const
 	//获取当前播放的动画中，所包含的动画曲线的某一个时刻的值
 	const float ClampedGait = GetAnimCurveClamped(NAME_W_Gait, -1.0, 0.0f, 1.0f);
 
-	//在走和奔跑的曲线之间进行插值
+	//在走和奔跑的曲线之间进行插值，通过速度获取曲线中[0, 1]的采样值，然后通过Gait去插值，得到步长
 	const float LerpedStrideBlend = 
 	FMath::Lerp(StrideBlend_N_Walk->GetFloatValue(CurveTime), StrideBlend_N_Run->GetFloatValue(CurveTime),
 	ClampedGait);
@@ -121,6 +133,39 @@ ECatRoleMovementDirection UCatRoleAnimInstance::CalculateMovementDirection() con
 	Delta.Normalize();
 	//判断角度是否在某个区间里面，然后计算出不同朝向
 	return UCatRoleMathLibrary::CalculateQuadrant(MovementDirection, 70.0f, -70.0f, 110.0f, -110.0f, 5.0f, Delta.Yaw);
+}
+
+FCatRoleVelocityBlend UCatRoleAnimInstance::CalculateVelocityBlend() const
+{
+	//将速度向量转换到角色局部空间，返回单位向量
+	const FVector LocRelativeVelocityDir =
+		CharacterInformation.CharacterActorRotation.UnrotateVector(CharacterInformation.Velocity.GetSafeNormal(0.1f));
+	const float Sum = FMath::Abs(LocRelativeVelocityDir.X) + FMath::Abs(LocRelativeVelocityDir.Y) +
+		FMath::Abs(LocRelativeVelocityDir.Z);
+	//获取权重总和1.0
+	const FVector RelativeDir = LocRelativeVelocityDir / Sum;
+	//计算权重分量
+	FCatRoleVelocityBlend Result;
+	Result.F = FMath::Clamp(RelativeDir.X, 0.0f, 1.0f);
+	Result.B = FMath::Abs(FMath::Clamp(RelativeDir.X, -1.0f, 0.0f));
+	Result.L = FMath::Abs(FMath::Clamp(RelativeDir.Y, -1.0f, 0.0f));
+	Result.R = FMath::Clamp(RelativeDir.Y, 0.0f, 1.0f);
+	return Result;
+}
+
+FVector UCatRoleAnimInstance::CalculateRelativeAccelerationAmount() const
+{
+	if (FVector::DotProduct(CharacterInformation.Acceleration, CharacterInformation.Velocity) > 0.0f)
+	{
+		const float MaxAcc = Character->GetCharacterMovement()->GetMaxAcceleration();
+		return CharacterInformation.CharacterActorRotation.UnrotateVector(
+			CharacterInformation.Acceleration.GetClampedToMaxSize(MaxAcc) / MaxAcc);
+	}
+	//制动力
+	const float MaxBrakingDec = Character->GetCharacterMovement()->GetMaxBrakingDeceleration();
+	return
+		CharacterInformation.CharacterActorRotation.UnrotateVector(
+			CharacterInformation.Acceleration.GetClampedToMaxSize(MaxBrakingDec) / MaxBrakingDec);
 }
 
 float UCatRoleAnimInstance::GetAnimCurveClamped(const FName& Name, float Bias, float ClampMin, float ClampMax) const

@@ -42,6 +42,11 @@ private:
 	//计算移动朝向
 	ECatRoleMovementDirection CalculateMovementDirection() const;
 
+	//计算速度混合，用于六向运动
+	FCatRoleVelocityBlend CalculateVelocityBlend() const;
+
+	FVector CalculateRelativeAccelerationAmount() const;
+
 	//工具
 	float GetAnimCurveClamped(const FName& Name, float Bias, float ClampMin, float ClampMax) const;
 public:
@@ -68,8 +73,20 @@ public:
 		ShowOnlyInnerProperties))
 	FCatRoleAnimGraphGrounded Grounded;
 
+	//用于六向运动
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
+	FCatRoleVelocityBlend VelocityBlend;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
 	FCatRoleMovementDirection MovementDirection = ECatRoleMovementDirection::Forward;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration|Main Configuration", Meta = (
+		ShowOnlyInnerProperties))
+	FCatRoleAnimConfiguration Config;
+
+	//在初冲刺和冲刺之间进行混合
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
+	FVector RelativeAccelerationAmount = FVector::ZeroVector;
 
 	//混合曲线
 	//用于步态姿势的混合，行走和奔跑的步长距离

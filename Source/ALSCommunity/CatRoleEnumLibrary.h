@@ -60,34 +60,3 @@ enum class ECatRoleMovementDirection : uint8
 	Left,
 	Backward
 };
-
-
-USTRUCT(BlueprintType)
-struct FCatRoleAnimCharacterInformation
-{
-	GENERATED_BODY()
-
-	//controller的旋转
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
-	FRotator AimingRotation = FRotator::ZeroRotator;
-
-	//角色速度方向
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
-	FVector Velocity = FVector::ZeroVector;
-
-	//移动输入
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
-	FVector MovementInput = FVector::ZeroVector;
-
-	//是否处于移动
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
-	bool bIsMoving = false;
-
-	//是否有输入移动
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
-	bool bHasMovementInput = false;
-
-	//速度
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
-	float Speed = 0.0f;
-};

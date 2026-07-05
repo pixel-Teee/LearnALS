@@ -73,6 +73,9 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
 	float GetSpeed() const { return Speed; }
 
+	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
+	FVector GetAcceleration() const { return Acceleration; }
+
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Essential Information")
 	FRotator GetAimingRotation() const { return AimingRotation; }
 
@@ -158,9 +161,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	float EasedMaxAcceleration = 0.0f;
 
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
+	FVector Acceleration = FVector::ZeroVector;
+
 	//camera的anim instance，去驱动更新camera manager
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Camera")
 	TObjectPtr<UCatRolePlayerCameraBehavior> CameraBehavior;
+
+	FVector PreviousVelocity = FVector::ZeroVector;
 
 	//custom movement component
 	UPROPERTY()
