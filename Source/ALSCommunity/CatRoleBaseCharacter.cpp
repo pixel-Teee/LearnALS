@@ -87,6 +87,18 @@ void ACatRoleBaseCharacter::RightMovementAction_Implementation(float Value)
 	}
 }
 
+void ACatRoleBaseCharacter::SprintAction_Implementation(bool bValue)
+{
+	if (bValue)
+	{
+		SetDesiredGait(ECatRoleGait::Sprinting);
+	}
+	else
+	{
+		SetDesiredGait(ECatRoleGait::Running);
+	}
+}
+
 void ACatRoleBaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode /*= 0*/)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
@@ -116,7 +128,16 @@ void ACatRoleBaseCharacter::SetMovementState(const ECatRoleMovementState NewStat
 
 void ACatRoleBaseCharacter::UpdateCharacterMovement()
 {
-	//TODO:implement this
+	const ECatRoleGait AllowedGait = GetAllowedGait();
+
+	const ECatRoleGait ActualGait = GetActualGait(AllowedGait);
+
+	if (ActualGait != Gait)
+	{
+		SetGait(ActualGait);
+	}
+
+
 }
 
 void ACatRoleBaseCharacter::UpdateGroundedRotation(float DeltaTime)
@@ -190,6 +211,76 @@ void ACatRoleBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 	}
 }
 
+ECatRoleGait ACatRoleBaseCharacter::GetAllowedGait() const
+{
+	if (Stance == ECatRoleStance::Standing)
+	{
+		if (RotationMode != ECatRoleRotationMode::Aiming)
+		{
+			if (DesiredGait == ECatRoleGait::Sprinting)
+			{
+				return CanSprint() ? ECatRoleGait::Sprinting : ECatRoleGait::Running;
+			}
+			return DesiredGait;
+		}
+	}
+
+	if (DesiredGait == ECatRoleGait::Sprinting)
+	{
+		return ECatRoleGait::Running;
+	}
+
+	return DesiredGait;
+}
+
+ECatRoleGait ACatRoleBaseCharacter::GetActualGait(ECatRoleGait AllowedGait) const
+{
+	const float LocWalkSpeed = MyCharacterMovementComponent->CurrentMovementSettings.WalkSpeed;
+	const float LocRunSpeed = MyCharacterMovementComponent->CurrentMovementSettings.RunSpeed;
+
+	if (Speed > LocRunSpeed + 10.0f)
+	{
+		if (AllowedGait == ECatRoleGait::Sprinting)
+		{
+			return ECatRoleGait::Sprinting;
+		}
+		return ECatRoleGait::Running;
+	}
+
+	if (Speed >= LocWalkSpeed + 10.0f)
+	{
+		return ECatRoleGait::Running;
+	}
+
+	return ECatRoleGait::Walking;
+}
+
+bool ACatRoleBaseCharacter::CanSprint() const
+{
+	if (!bHasMovementInput || RotationMode == ECatRoleRotationMode::Aiming)
+	{
+		return false;
+	}
+
+	const bool bValidInputAmount = MovementInputAmount > 0.9f;
+
+	if (RotationMode == ECatRoleRotationMode::VelocityDirection)
+	{
+		return bValidInputAmount;
+	}
+
+	if (RotationMode == ECatRoleRotationMode::LookingDirection)
+	{
+		const FRotator AccRot = ReplicatedCurrentAcceleration.ToOrientationRotator();
+		FRotator Delta = AccRot - AimingRotation;
+		Delta.Normalize();
+
+		return bValidInputAmount && FMath::Abs(Delta.Yaw) < 50.0f;
+	}
+
+	return false;
+}
+
 void ACatRoleBaseCharacter::SetGait(ECatRoleGait NewGait, bool bForce /*= false*/)
 {
 	if (bForce || Gait != NewGait)
@@ -197,6 +288,11 @@ void ACatRoleBaseCharacter::SetGait(ECatRoleGait NewGait, bool bForce /*= false*
 		const ECatRoleGait Prev = Gait;
 		Gait = NewGait;
 	}
+}
+
+void ACatRoleBaseCharacter::SetDesiredGait(ECatRoleGait NewGait)
+{
+	DesiredGait = NewGait;
 }
 
 FVector ACatRoleBaseCharacter::GetMovementInput() const

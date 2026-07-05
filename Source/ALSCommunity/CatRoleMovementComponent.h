@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "CatRoleStructLibrary.h"
 #include "CatRoleMovementComponent.generated.h"
 
 /**
@@ -14,7 +15,9 @@ class ALSCOMMUNITY_API UCatRoleMovementComponent : public UCharacterMovementComp
 {
 	GENERATED_BODY()
 	
-	
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Movement System")
+	FCatRoleMovementSettings CurrentMovementSettings;
 	
 	
 };

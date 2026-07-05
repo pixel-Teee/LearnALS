@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
 	void RightMovementAction(float Value);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
+	void SprintAction(bool bValue);
+
 	//摄像机系统
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Camera System")
 	void SetCameraBehavior(UCatRolePlayerCameraBehavior* CamBeh) { CameraBehavior = CamBeh; }
@@ -58,6 +61,15 @@ public:
 	//更新角色转向（移动摄像机的时候，让角色比如也朝向摄像机看向的位置）
 	void UpdateGroundedRotation(float DeltaTime);
 
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Movement System")
+	ECatRoleGait GetAllowedGait() const;
+
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Movement System")
+	ECatRoleGait GetActualGait(ECatRoleGait AllowedGait) const;
+
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Movement System")
+	bool CanSprint() const;
+
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
 	ECatRoleMovementState GetMovementState() const { return MovementState; }
 
@@ -66,6 +78,9 @@ public:
 
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
 	ECatRoleGait GetGait() const { return Gait; }
+
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Character States")
+	void SetDesiredGait(ECatRoleGait NewGait);
 
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Essential Information")
 	FVector GetMovementInput() const;
@@ -129,6 +144,15 @@ protected:
 	//步态，慢走，奔跑，冲刺
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|State Values")
 	ECatRoleGait Gait = ECatRoleGait::Walking;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CatRole|State Values")
+	ECatRoleStance Stance = ECatRoleStance::Standing;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatRole|Input")
+	ECatRoleGait DesiredGait = ECatRoleGait::Running;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatRole|Input")
+	ECatRoleStance DesiredStance = ECatRoleStance::Standing;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Rotation System")
 	FRotator TargetRotation = FRotator::ZeroRotator;

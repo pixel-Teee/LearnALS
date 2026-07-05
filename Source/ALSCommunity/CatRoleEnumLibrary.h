@@ -60,3 +60,10 @@ enum class ECatRoleMovementDirection : uint8
 	Left,
 	Backward
 };
+
+UENUM(BlueprintType, meta = (ScriptName = "CatRole_Stance"))
+enum class ECatRoleStance : uint8
+{
+	Standing,
+	Crouching
+};
