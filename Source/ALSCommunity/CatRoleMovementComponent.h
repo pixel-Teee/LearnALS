@@ -13,11 +13,25 @@
 UCLASS()
 class ALSCOMMUNITY_API UCatRoleMovementComponent : public UCharacterMovementComponent
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 	
 public:
+	virtual void OnMovementUpdated(float DeltaTime, const FVector& OldLocation, const FVector& OldVelocity) override;
+
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Movement System")
 	FCatRoleMovementSettings CurrentMovementSettings;
+
+	UPROPERTY()
+	ECatRoleGait AllowedGait = ECatRoleGait::Walking;
+
+	// Movement Settings Variables
+	UPROPERTY()
+	uint8 bRequestMovementSettingsChange = 1;
 	
-	
+	// Set Max Walking Speed (Called from the owning client)
+	UFUNCTION(BlueprintCallable, Category = "Movement Settings")
+	void SetAllowedGait(ECatRoleGait NewAllowedGait);
+
+	UFUNCTION(BlueprintCallable, Category = "Movement Settings")
+	void SetMovementSettings(FCatRoleMovementSettings NewMovementSettings);
 };

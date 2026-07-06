@@ -98,3 +98,11 @@ void ACatRolePlayerController::CameraRightAction(const FInputActionValue& Value)
 		PossessedCharacter->CameraRightAction(Value.GetMagnitude());
 	}
 }
+
+void ACatRolePlayerController::SprintAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter)
+	{
+		PossessedCharacter->SprintAction(Value.Get<bool>());
+	}
+}

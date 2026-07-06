@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CatRoleStructEnumLibrary.h"
+#include "CatRoleStructLibrary.h"
 #include "CatRoleBaseCharacter.generated.h"
 
 class UCatRolePlayerCameraBehavior;
@@ -103,6 +104,9 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Movement System")
 	bool HasMovementInput() const { return bHasMovementInput; }
 
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Movement System")
+	FCatRoleMovementSettings GetTargetMovementSettings() const;
+
 	//工具
 	float CalculateGroundedRotationRate() const;
 
@@ -113,6 +117,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Utility")
 	float GetAnimCurveValue(FName CurveName) const;
+
+	void SetMovementModel();
 protected:
 	//输入
 	UPROPERTY(EditDefaultsOnly, Category = "CatRole|Input", BlueprintReadOnly)
@@ -193,6 +199,12 @@ protected:
 	TObjectPtr<UCatRolePlayerCameraBehavior> CameraBehavior;
 
 	FVector PreviousVelocity = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Movement System")
+	FDataTableRowHandle MovementModel;
+
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Movement System")
+	FCatRoleMovementStateSettings MovementData;
 
 	//custom movement component
 	UPROPERTY()

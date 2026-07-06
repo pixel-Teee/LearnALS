@@ -29,8 +29,14 @@ void ACatRoleBaseCharacter::PostInitializeComponents()
 void ACatRoleBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//移动配置数据
+	SetMovementModel();
+
+	//获取配置数据，设置到CMC里面
+	MyCharacterMovementComponent->SetMovementSettings(GetTargetMovementSettings());
 	
-	//设置默认的旋转值
+	//设置默认的旋转值 
 	TargetRotation = GetActorRotation();
 	LastVelocityRotation = TargetRotation;
 	LastMovementInputRotation = TargetRotation;
@@ -137,7 +143,8 @@ void ACatRoleBaseCharacter::UpdateCharacterMovement()
 		SetGait(ActualGait);
 	}
 
-
+	//设置了移动步伐，应当更新CMC的最大移动速度
+	MyCharacterMovementComponent->SetAllowedGait(AllowedGait);
 }
 
 void ACatRoleBaseCharacter::UpdateGroundedRotation(float DeltaTime)
@@ -336,6 +343,46 @@ void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)
 
 }
 
+FCatRoleMovementSettings ACatRoleBaseCharacter::GetTargetMovementSettings() const
+{
+	if (RotationMode == ECatRoleRotationMode::VelocityDirection)
+	{
+		if (Stance == ECatRoleStance::Standing)
+		{
+			return MovementData.VelocityDirection.Standing;
+		}
+		if (Stance == ECatRoleStance::Crouching)
+		{
+			return MovementData.VelocityDirection.Crouching;
+		}
+	}
+	else if (RotationMode == ECatRoleRotationMode::LookingDirection)
+	{
+		if (Stance == ECatRoleStance::Standing)
+		{
+			return MovementData.LookingDirection.Standing;
+		}
+		if (Stance == ECatRoleStance::Crouching)
+		{
+			return MovementData.LookingDirection.Crouching;
+		}
+	}
+	else if (RotationMode == ECatRoleRotationMode::Aiming)
+	{
+		if (Stance == ECatRoleStance::Standing)
+		{
+			return MovementData.Aiming.Standing;
+		}
+		if (Stance == ECatRoleStance::Crouching)
+		{
+			return MovementData.Aiming.Crouching;
+		}
+	}
+
+	// Default to velocity dir standing
+	return MovementData.VelocityDirection.Standing;
+}
+
 float ACatRoleBaseCharacter::CalculateGroundedRotationRate() const
 {
 	//获取在不同速度下的旋转速率
@@ -373,5 +420,14 @@ float ACatRoleBaseCharacter::GetAnimCurveValue(FName CurveName) const
 	}
 
 	return 0.0f;
+}
+
+void ACatRoleBaseCharacter::SetMovementModel()
+{
+	const FString ContextString = GetFullName();
+	FCatRoleMovementStateSettings* OutRow =
+		MovementModel.DataTable->FindRow<FCatRoleMovementStateSettings>(MovementModel.RowName, ContextString);
+	check(OutRow);
+	MovementData = *OutRow;
 }
 

@@ -35,6 +35,9 @@ protected:
 
 	UFUNCTION()
 	void CameraRightAction(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void SprintAction(const FInputActionValue& Value);
 public:
 	/** Main character reference */
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole")

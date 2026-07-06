@@ -42,3 +42,30 @@ struct FCatRoleMovementSettings
 		}
 	}
 };
+
+USTRUCT(BlueprintType)
+struct FCatRoleMovementStanceSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Movement Settings")
+	FCatRoleMovementSettings Standing;
+
+	UPROPERTY(EditAnywhere, Category = "Movement Settings")
+	FCatRoleMovementSettings Crouching;
+};
+
+USTRUCT(BlueprintType)
+struct FCatRoleMovementStateSettings : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Movement Settings")
+	FCatRoleMovementStanceSettings VelocityDirection;
+
+	UPROPERTY(EditAnywhere, Category = "Movement Settings")
+	FCatRoleMovementStanceSettings LookingDirection;
+
+	UPROPERTY(EditAnywhere, Category = "Movement Settings")
+	FCatRoleMovementStanceSettings Aiming;
+};
