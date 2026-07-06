@@ -54,6 +54,8 @@ void ACatRoleBaseCharacter::Tick(float DeltaTime)
 		UpdateCharacterMovement();
 		UpdateGroundedRotation(DeltaTime);
 	}
+
+	PreviousAimYaw = AimingRotation.Yaw;
 }
 
 // Called to bind functionality to input
@@ -340,7 +342,9 @@ void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)
 	{
 		//TODO:Implement This
 	}
-
+	// Set the Aim Yaw rate by comparing the current and previous Aim Yaw value, divided by Delta Seconds.
+	// This represents the speed the camera is rotating left to right.
+	AimYawRate = FMath::Abs((AimingRotation.Yaw - PreviousAimYaw) / DeltaTime);
 }
 
 FCatRoleMovementSettings ACatRoleBaseCharacter::GetTargetMovementSettings() const
@@ -386,7 +390,11 @@ FCatRoleMovementSettings ACatRoleBaseCharacter::GetTargetMovementSettings() cons
 float ACatRoleBaseCharacter::CalculateGroundedRotationRate() const
 {
 	//获取在不同速度下的旋转速率
-	return 0;
+	const float MappedSpeedVal = MyCharacterMovementComponent->GetMappedSpeed();
+	const float CurveVal =
+		MyCharacterMovementComponent->CurrentMovementSettings.RotationRateCurve->GetFloatValue(MappedSpeedVal);
+	const float ClampedAimYawRate = FMath::GetMappedRangeValueClamped<float, float>({ 0.0f, 300.0f }, { 1.0f, 3.0f }, AimYawRate);
+	return CurveVal * ClampedAimYawRate;
 }
 
 void ACatRoleBaseCharacter::SmoothCharacterRotation(FRotator Target, float TargetInterpSpeed, float ActorInterpSpeed, float DeltaTime)

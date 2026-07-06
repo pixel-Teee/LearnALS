@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement Settings")
 	void SetAllowedGait(ECatRoleGait NewAllowedGait);
 
+	// Set Movement Curve (Called in every instance)
+	float GetMappedSpeed() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Movement Settings")
 	void SetMovementSettings(FCatRoleMovementSettings NewMovementSettings);
 };

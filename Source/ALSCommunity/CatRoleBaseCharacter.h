@@ -98,6 +98,9 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
 	bool IsMoving() const { return bIsMoving; }
 
+	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
+	float GetAimYawRate() const { return AimYawRate; }
+
 	//每帧获取一些重要信息，从CMC组件
 	void SetEssentialValues(float DetalTime);
 
@@ -181,6 +184,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	float MovementInputAmount = 0.0f; //加速度的单位向量
 
+	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
+	float AimYawRate = 0.0f;
+
 	//复制的重要信息(TODO:加上复制的必要标记)
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole|Essential Information")
 	FVector ReplicatedCurrentAcceleration = FVector::ZeroVector;
@@ -199,6 +205,8 @@ protected:
 	TObjectPtr<UCatRolePlayerCameraBehavior> CameraBehavior;
 
 	FVector PreviousVelocity = FVector::ZeroVector;
+
+	float PreviousAimYaw = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Movement System")
 	FDataTableRowHandle MovementModel;

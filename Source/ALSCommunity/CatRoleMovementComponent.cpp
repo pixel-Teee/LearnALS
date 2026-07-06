@@ -53,6 +53,30 @@ void UCatRoleMovementComponent::SetAllowedGait(ECatRoleGait NewAllowedGait)
 	}
 }
 
+float UCatRoleMovementComponent::GetMappedSpeed() const
+{
+	// Map the character's current speed to the configured movement speeds with a range of 0-3,
+	// with 0 = stopped, 1 = the Walk Speed, 2 = the Run Speed, and 3 = the Sprint Speed.
+	// This allows us to vary the movement speeds but still use the mapped range in calculations for consistent results
+
+	const float Speed = Velocity.Size2D();
+	const float LocWalkSpeed = CurrentMovementSettings.WalkSpeed;
+	const float LocRunSpeed = CurrentMovementSettings.RunSpeed;
+	const float LocSprintSpeed = CurrentMovementSettings.SprintSpeed;
+
+	if (Speed > LocRunSpeed)
+	{
+		return FMath::GetMappedRangeValueClamped<float, float>({ LocRunSpeed, LocSprintSpeed }, { 2.0f, 3.0f }, Speed);
+	}
+
+	if (Speed > LocWalkSpeed)
+	{
+		return FMath::GetMappedRangeValueClamped<float, float>({ LocWalkSpeed, LocRunSpeed }, { 1.0f, 2.0f }, Speed);
+	}
+
+	return FMath::GetMappedRangeValueClamped<float, float>({ 0.0f, LocWalkSpeed }, { 0.0f, 1.0f }, Speed);
+}
+
 void UCatRoleMovementComponent::SetMovementSettings(FCatRoleMovementSettings NewMovementSettings)
 {
 	CurrentMovementSettings = NewMovementSettings;
