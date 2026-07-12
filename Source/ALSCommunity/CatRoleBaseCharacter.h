@@ -74,6 +74,9 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
 	ECatRoleMovementState GetMovementState() const { return MovementState; }
 
+	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
+	ECatRoleOverlayState GetOverlayState() const { return OverlayState; }
+
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Character States")
 	void SetGait(ECatRoleGait NewGait, bool bForce = false);
 
@@ -100,6 +103,9 @@ public:
 
 	UFUNCTION(BlueprintGetter, Category = "CatRole|Essential Information")
 	float GetAimYawRate() const { return AimYawRate; }
+
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Character States")
+	void SetOverlayState(ECatRoleOverlayState NewState, bool bForce = false);
 
 	//每帧获取一些重要信息，从CMC组件
 	void SetEssentialValues(float DetalTime);
@@ -156,6 +162,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CatRole|State Values")
 	ECatRoleStance Stance = ECatRoleStance::Standing;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatRole|State Values")
+	ECatRoleOverlayState OverlayState = ECatRoleOverlayState::Default;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatRole|Input")
 	ECatRoleGait DesiredGait = ECatRoleGait::Running;

@@ -309,6 +309,15 @@ FVector ACatRoleBaseCharacter::GetMovementInput() const
 	return ReplicatedCurrentAcceleration;
 }
 
+void ACatRoleBaseCharacter::SetOverlayState(ECatRoleOverlayState NewState, bool bForce /*= false*/)
+{
+	if (bForce || OverlayState != NewState)
+	{
+		const ECatRoleOverlayState Prev = OverlayState;
+		OverlayState = NewState;
+	}
+}
+
 void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)
 {
 	if (GetLocalRole() != ROLE_SimulatedProxy)

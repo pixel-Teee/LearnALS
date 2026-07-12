@@ -8,6 +8,7 @@
 #include "Curves/CurveVector.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+static const FName NAME_BasePose_N(TEXT("BasePose_N"));
 static const FName NAME_BasePose_CLF(TEXT("BasePose_CLF"));
 static const FName NAME_W_Gait(TEXT("W_Gait"));
 
@@ -45,6 +46,11 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	//controller的旋转，视角的旋转
 	CharacterInformation.AimingRotation = Character->GetAimingRotation();
+
+	//角色各种状态，比如搬箱子
+	OverlayState = Character->GetOverlayState();
+	//更新层混合权重，用于层混合
+	UpdateLayerValues();
 	if (MovementState.Grounded())
 	{
 		const bool bPrevShouldMove = Grounded.bShouldMove;
@@ -171,6 +177,21 @@ FVector UCatRoleAnimInstance::CalculateRelativeAccelerationAmount() const
 float UCatRoleAnimInstance::GetAnimCurveClamped(const FName& Name, float Bias, float ClampMin, float ClampMax) const
 {
 	return FMath::Clamp(GetCurveValue(Name) + Bias, ClampMin, ClampMax);
+}
+
+void UCatRoleAnimInstance::UpdateLayerValues()
+{
+	//基础姿势权重
+	//LayerBlendingValues.BasePose_N = GetCurveValue(NAME_BasePose_N);
+	//LayerBlendingValues.BasePose_CLF = GetCurveValue(NAME_BasePose_CLF);
+
+	//TODO:fix this
+	LayerBlendingValues.BasePose_N = 1.0;
+	LayerBlendingValues.BasePose_CLF = 0.0;
+
+	//空中预测
+	//TODO:fix this
+	InAir.LandPrediction = 1.0;
 }
 
 bool UCatRoleAnimInstance::ShouldMoveCheck() const

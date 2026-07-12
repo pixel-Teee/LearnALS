@@ -67,3 +67,21 @@ enum class ECatRoleStance : uint8
 	Standing,
 	Crouching
 };
+
+UENUM(BlueprintType, meta = (ScriptName = "CatRole_OverlayState"))
+enum class ECatRoleOverlayState : uint8
+{
+	Default,
+	Masculine,
+	Feminine,
+	Injured,
+	HandsTied,
+	Rifle,
+	PistolOneHanded,
+	PistolTwoHanded,
+	Bow,
+	Torch,
+	Binoculars,
+	Box,
+	Barrel
+};

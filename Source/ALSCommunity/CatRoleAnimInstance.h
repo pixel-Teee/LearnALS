@@ -49,6 +49,9 @@ private:
 
 	//工具
 	float GetAnimCurveClamped(const FName& Name, float Bias, float ClampMin, float ClampMax) const;
+
+	//更新用于层混合的参数
+	void UpdateLayerValues();
 public:
 	//开启移动动画，如果IsMoving并且HasMovementInput，或者速度如果大于150
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Grounded")
@@ -61,6 +64,10 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information", Meta = (
 		ShowOnlyInnerProperties))
 	FCatRoleAnimCharacterInformation CharacterInformation;
+
+	//叠加状态
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information")
+	FCatRoleOverlayState OverlayState = ECatRoleOverlayState::Default;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information")
 	FCatRoleMovementState MovementState = ECatRoleMovementState::None;
@@ -77,12 +84,22 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
 	FCatRoleVelocityBlend VelocityBlend;
 
+	//空中
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - In Air", Meta = (
+		ShowOnlyInnerProperties))
+	FCatRoleAnimGraphInAir InAir;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
 	FCatRoleMovementDirection MovementDirection = ECatRoleMovementDirection::Forward;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration|Main Configuration", Meta = (
 		ShowOnlyInnerProperties))
 	FCatRoleAnimConfiguration Config;
+
+	//层混合
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Layer Blending", Meta = (
+		ShowOnlyInnerProperties))
+	FCatRoleAnimGraphLayerBlending LayerBlendingValues;
 
 	//在初冲刺和冲刺之间进行混合
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")

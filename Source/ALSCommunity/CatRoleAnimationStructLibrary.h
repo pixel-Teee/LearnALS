@@ -94,6 +94,29 @@ struct FCatRoleAnimCharacterInformation
 	float Speed = 0.0f;
 
 	//加速度
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ALS|Character Information")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Character Information")
 	FVector Acceleration = FVector::ZeroVector;
+};
+
+USTRUCT(BlueprintType)
+struct FCatRoleAnimGraphLayerBlending
+{
+	GENERATED_BODY()
+
+	//混合站立和蹲伏的权重
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Layer Blending")
+	float BasePose_N = 1.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Layer Blending")
+	float BasePose_CLF = 0.0f;
+};
+
+USTRUCT(BlueprintType)
+struct FCatRoleAnimGraphInAir
+{
+	GENERATED_BODY()
+
+	//混合基础姿势中在空中的权重
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - In Air")
+	float LandPrediction = 1.0f;
 };
