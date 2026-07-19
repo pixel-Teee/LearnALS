@@ -211,3 +211,88 @@ public:
 		Barrel_ = State == ECatRoleOverlayState::Barrel;
 	}
 };
+
+USTRUCT(BlueprintType)
+struct FCatRoleMovementAction
+{
+	GENERATED_BODY()
+
+private:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Movement System")
+	ECatRoleMovementAction Action = ECatRoleMovementAction::None;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Movement System")
+	bool None_ = true;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Movement System")
+	bool LowMantle_ = false;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Movement System")
+	bool HighMantle_ = false;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Movement System")
+	bool Rolling_ = false;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Movement System")
+	bool GettingUp_ = false;
+
+public:
+	FCatRoleMovementAction()
+	{
+	}
+
+	FCatRoleMovementAction(const ECatRoleMovementAction InitialAction) { *this = InitialAction; }
+
+	const bool& None() const { return None_; }
+	const bool& LowMantle() const { return LowMantle_; }
+	const bool& HighMantle() const { return HighMantle_; }
+	const bool& Rolling() const { return Rolling_; }
+	const bool& GettingUp() const { return GettingUp_; }
+
+	operator ECatRoleMovementAction() const { return Action; }
+
+	void operator=(const ECatRoleMovementAction NewAction)
+	{
+		Action = NewAction;
+		None_ = Action == ECatRoleMovementAction::None;
+		LowMantle_ = Action == ECatRoleMovementAction::LowMantle;
+		HighMantle_ = Action == ECatRoleMovementAction::HighMantle;
+		Rolling_ = Action == ECatRoleMovementAction::Rolling;
+		GettingUp_ = Action == ECatRoleMovementAction::GettingUp;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FCatRoleStance
+{
+	GENERATED_BODY()
+
+private:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Character States")
+	ECatRoleStance Stance = ECatRoleStance::Standing;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Character States")
+	bool Standing_ = true;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "CatRole|Character States")
+	bool Crouching_ = false;
+
+public:
+	FCatRoleStance()
+	{
+	}
+
+	FCatRoleStance(const ECatRoleStance InitialStance) { *this = InitialStance; }
+
+	const bool& Standing() const { return Standing_; }
+	const bool& Crouching() const { return Crouching_; }
+
+	operator ECatRoleStance() const { return Stance; }
+
+	void operator=(const ECatRoleStance NewStance)
+	{
+		Stance = NewStance;
+		Standing_ = Stance == ECatRoleStance::Standing;
+		Crouching_ = Stance == ECatRoleStance::Crouching;
+	}
+};

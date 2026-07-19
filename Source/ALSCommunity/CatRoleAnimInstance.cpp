@@ -34,6 +34,13 @@ void UCatRoleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	MovementState = Character->GetMovementState();
 	//步态走姿
 	Gait = Character->GetGait();
+
+	//站立还是蹲伏，用于在站立和蹲伏之间进行切换
+	Stance = Character->GetStance();
+
+	//移动行为
+	MovementAction = Character->GetMovementAction();
+	
 	//移动输入(从CMC获取的)
 	CharacterInformation.MovementInput = Character->GetMovementInput();
 	CharacterInformation.Speed = Character->GetSpeed();
@@ -76,6 +83,11 @@ void UCatRoleAnimInstance::UpdateMovementValues(float DeltaSeconds)
 	VelocityBlend.R = FMath::FInterpTo(VelocityBlend.R, TargetBlend.R, DeltaSeconds, Config.VelocityBlendInterpSpeed);
 
 	RelativeAccelerationAmount = CalculateRelativeAccelerationAmount();
+	//计算奔跑的时候倾斜程度
+	LeanAmount.LR = FMath::FInterpTo(LeanAmount.LR, RelativeAccelerationAmount.Y, DeltaSeconds,
+		Config.GroundedLeanInterpSpeed);
+	LeanAmount.FB = FMath::FInterpTo(LeanAmount.FB, RelativeAccelerationAmount.X, DeltaSeconds,
+		Config.GroundedLeanInterpSpeed);
 
 	//计算 walk/run 混合
 	Grounded.WalkRunBlend = CalculateWalkRunBlend();

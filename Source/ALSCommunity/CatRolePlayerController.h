@@ -38,6 +38,9 @@ protected:
 
 	UFUNCTION()
 	void SprintAction(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void StanceAction(const FInputActionValue& Value);
 public:
 	/** Main character reference */
 	UPROPERTY(BlueprintReadOnly, Category = "CatRole")

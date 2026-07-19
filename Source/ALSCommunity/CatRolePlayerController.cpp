@@ -106,3 +106,11 @@ void ACatRolePlayerController::SprintAction(const FInputActionValue& Value)
 		PossessedCharacter->SprintAction(Value.Get<bool>());
 	}
 }
+
+void ACatRolePlayerController::StanceAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter && Value.Get<bool>())
+	{
+		PossessedCharacter->StanceAction();
+	}
+}

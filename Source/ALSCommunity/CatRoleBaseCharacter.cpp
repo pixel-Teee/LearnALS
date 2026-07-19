@@ -107,6 +107,28 @@ void ACatRoleBaseCharacter::SprintAction_Implementation(bool bValue)
 	}
 }
 
+void ACatRoleBaseCharacter::StanceAction_Implementation()
+{
+	if (MovementAction != ECatRoleMovementAction::None)
+	{
+		return;
+	}
+
+	if (MovementState == ECatRoleMovementState::Grounded)
+	{
+		if (Stance == ECatRoleStance::Standing)
+		{
+			SetDesiredStance(ECatRoleStance::Crouching);
+			Crouch();
+		}
+		else if (Stance == ECatRoleStance::Crouching)
+		{
+			SetDesiredStance(ECatRoleStance::Standing);
+			UnCrouch();
+		}
+	}
+}
+
 void ACatRoleBaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode /*= 0*/)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
@@ -316,6 +338,40 @@ void ACatRoleBaseCharacter::SetOverlayState(ECatRoleOverlayState NewState, bool 
 		const ECatRoleOverlayState Prev = OverlayState;
 		OverlayState = NewState;
 	}
+}
+
+void ACatRoleBaseCharacter::SetDesiredStance(ECatRoleStance NewStance)
+{
+
+}
+
+void ACatRoleBaseCharacter::SetStance(ECatRoleStance NewStance, bool bForce /*= false*/)
+{
+	if (bForce || Stance != NewStance)
+	{
+		const ECatRoleStance Prev = Stance;
+		Stance = NewStance;
+		//OnStanceChanged(Prev);
+	}
+}
+
+void ACatRoleBaseCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+
+	SetStance(ECatRoleStance::Crouching);
+}
+
+void ACatRoleBaseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+
+	SetStance(ECatRoleStance::Standing);
+}
+
+ECatRoleMovementAction ACatRoleBaseCharacter::GetMovementAction() const
+{
+	return MovementAction;
 }
 
 void ACatRoleBaseCharacter::SetEssentialValues(float DeltaTime)

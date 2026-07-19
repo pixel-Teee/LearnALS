@@ -60,6 +60,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Read Only Data|Character Information")
 	TObjectPtr<ACatRoleBaseCharacter> Character = nullptr;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information")
+	FCatRoleStance Stance = ECatRoleStance::Standing;
+
 	//角色信息
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information", Meta = (
 		ShowOnlyInnerProperties))
@@ -83,6 +86,10 @@ public:
 	//用于六向运动
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
 	FCatRoleVelocityBlend VelocityBlend;
+
+	//倾斜程度
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - Grounded")
+	FCatRoleLeanAmount LeanAmount;
 
 	//空中
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Anim Graph - In Air", Meta = (
@@ -121,4 +128,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration|Blend Curves")
 	TObjectPtr<UCurveVector> YawOffset_LR = nullptr;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information")
+	FCatRoleMovementAction MovementAction = ECatRoleMovementAction::None;
 };

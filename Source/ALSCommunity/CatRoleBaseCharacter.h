@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CatRoleEnumLibrary.h"
 #include "CatRoleStructEnumLibrary.h"
 #include "CatRoleStructLibrary.h"
 #include "CatRoleBaseCharacter.generated.h"
@@ -40,11 +41,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
 	void CameraRightAction(float Value);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
 	void RightMovementAction(float Value);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ALS|Input")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
 	void SprintAction(bool bValue);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CatRole|Input")
+	void StanceAction();
 
 	//摄像机系统
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Camera System")
@@ -106,6 +110,25 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CatRole|Character States")
 	void SetOverlayState(ECatRoleOverlayState NewState, bool bForce = false);
+
+	UFUNCTION(BlueprintGetter, Category = "CatRole|Input")
+	ECatRoleStance GetDesiredStance() const { return DesiredStance; }
+
+	UFUNCTION(BlueprintSetter, Category = "CatRole|Input")
+	void SetDesiredStance(ECatRoleStance NewStance);
+
+	UFUNCTION(BlueprintCallable, Category = "CatRole|Character States")
+	void SetStance(ECatRoleStance NewStance, bool bForce = false);
+
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+
+	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
+	ECatRoleStance GetStance() const { return Stance; }
+
+	UFUNCTION(BlueprintGetter, Category = "CatRole|Character States")
+	ECatRoleMovementAction GetMovementAction() const;
 
 	//每帧获取一些重要信息，从CMC组件
 	void SetEssentialValues(float DetalTime);

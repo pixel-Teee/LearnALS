@@ -30,6 +30,9 @@ struct FCatRoleAnimGraphGrounded
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
 	float RYaw = 0.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "CatRole|Anim Graph - Grounded")
+	bool bPivot = false;
 };
 
 //速度混合，用于六向运动
@@ -58,6 +61,9 @@ struct FCatRoleAnimConfiguration
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatRole|Main Configuration")
 	float VelocityBlendInterpSpeed = 12.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatRole|Main Configuration")
+	float GroundedLeanInterpSpeed = 4.0f;
 };
 
 
@@ -119,4 +125,16 @@ struct FCatRoleAnimGraphInAir
 	//混合基础姿势中在空中的权重
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - In Air")
 	float LandPrediction = 1.0f;
+};
+
+USTRUCT(BlueprintType)
+struct FCatRoleLeanAmount
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
+	float LR = 0.0f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CatRole|Anim Graph - Grounded")
+	float FB = 0.0f;
 };
